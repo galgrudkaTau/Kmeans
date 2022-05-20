@@ -353,6 +353,7 @@ int main(int argc, char *argv[]){
     restartClusters(clusters, k, 1); /*this array holds K datapoints*/
     kMeans(k, size, d, max_iter, centroids, clusters, datapointMatrix);
     writeToFile(centroids, k, d, outputFileName);
+    free(datapointMatrix[0]); /*free centroid*/
     free(datapointMatrix);
     free(centroids);
     free(clusters);
