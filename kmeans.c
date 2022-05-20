@@ -17,7 +17,7 @@ double** fileToDataPoints(FILE *ifp,int d, int size);
 int findDimension(FILE *ifp);
 int findInputSize(FILE *ifp);
 double **inizializeCentroids(int k, int d, double **datapoints);
-void restartClusters(LINK *clusters, int k);
+void restartClusters(LINK *clusters, int k, int conti);
 void delete_list(LINK head);
 void kMeans(int k, int size, int d, int max_iter, double **cents, LINK *clusters, double **matrix);
 void assignToCluster(double **cents,double** datapoints,LINK *clusters, int k, int size, int d);
@@ -137,14 +137,15 @@ double ** inizializeCentroids(int k, int d, double **datapoints){
         for (j=0; j<d; j++){
             matrix[i][j] = datapoints[i][j]; 
         }
-    } 
+    }  
     return matrix; 
 }
 
-void restartClusters(LINK *clusters, int k) {
+void restartClusters(LINK *clusters, int k, int conti) {
     int i;
     LINK current;
-    for (i=0; i<k; i++) {
+    if (conti>0){ /* should do restart and new intilazation */
+        for (i=0; i<k; i++) {
         current = clusters[i];
         delete_list(current);
         clusters[i] = (ELEMENT*)malloc(sizeof(ELEMENT));
@@ -153,7 +154,15 @@ void restartClusters(LINK *clusters, int k) {
         }
         clusters[i]->datapoint = -1;
         clusters[i]->next = NULL;
+        }
     }
+    else{
+       for (i=0; i<k; i++) {
+        current = clusters[i];
+        delete_list(current);
+        } 
+    }
+    
 }
 
 void delete_list(LINK head) {
@@ -237,7 +246,7 @@ int updateCentroids(double **cents, LINK *clusters, double** inputMatrix ,int k,
             sum[s] = 0;
         }
     }
-    restartClusters(clusters, k);
+    restartClusters(clusters, k, difference);
     free(sum);
     return difference > 0;
 }
@@ -341,10 +350,9 @@ int main(int argc, char *argv[]){
     if (clusters == NULL){
         anErrorHasOccurred();
     }
-    restartClusters(clusters, k);
+    restartClusters(clusters, k, 1); /*this array holds K datapoints*/
     kMeans(k, size, d, max_iter, centroids, clusters, datapointMatrix);
     writeToFile(centroids, k, d, outputFileName);
-    
     free(datapointMatrix);
     free(centroids);
     free(clusters);
