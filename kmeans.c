@@ -355,6 +355,7 @@ int main(int argc, char *argv[]){
     writeToFile(centroids, k, d, outputFileName);
     free(datapointMatrix[0]); /*free centroid*/
     free(datapointMatrix);
+    free(centroids[0]);
     free(centroids);
     free(clusters);
     return 0;
